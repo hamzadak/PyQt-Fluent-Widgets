@@ -18,7 +18,7 @@ from ...common.style_sheet import FluentStyleSheet
 class ComboItem:
     """ Combo box item """
 
-    def __init__(self, text: str, icon: Union[str, QIcon, FluentIconBase] = None, userData=None):
+    def __init__(self, text: str, icon: Union[str, QIcon, FluentIconBase] = None, userData=None, isEnabled=True):
         """ add item
 
         Parameters
@@ -31,10 +31,14 @@ class ComboItem:
 
         userData: Any
             user data
+
+        isEnabled: bool
+            whether to enable the item
         """
         self.text = text
         self.userData = userData
         self.icon = icon
+        self.isEnabled = isEnabled
 
     @property
     def icon(self):
@@ -224,6 +228,11 @@ class ComboBoxBase:
         if 0 <= index < len(self.items):
             self.items[index].icon = icon
 
+    def setItemEnabled(self, index: int, isEnabled: bool):
+        """ Sets the enabled status of the item on the given index """
+        if 0 <= index < len(self.items):
+            self.items[index].isEnabled = isEnabled
+
     def findData(self, data):
         """ Returns the index of the item containing the given data, otherwise returns -1 """
         for i, item in enumerate(self.items):
@@ -306,7 +315,9 @@ class ComboBoxBase:
 
         menu = self._createComboMenu()
         for item in self.items:
-            menu.addAction(QAction(item.icon, item.text))
+            action = QAction(item.icon, item.text)
+            action.setEnabled(item.isEnabled)
+            menu.addAction(action)
 
         # fixes issue #468
         menu.view.itemClicked.connect(lambda i: self._onItemClicked(self.findText(i.text().lstrip())))
@@ -346,6 +357,9 @@ class ComboBoxBase:
             self._showComboMenu()
 
     def _onItemClicked(self, index):
+        if not self.items[index].isEnabled:
+            return
+
         if index != self.currentIndex():
             self.setCurrentIndex(index)
 
