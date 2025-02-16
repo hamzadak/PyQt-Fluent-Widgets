@@ -1,5 +1,6 @@
 # coding:utf-8
 from enum import Enum
+import sys
 from typing import Union
 import weakref
 
@@ -7,7 +8,7 @@ from PyQt6.QtCore import (Qt, QEvent, QSize, QRectF, QObject, QPropertyAnimation
                           QEasingCurve, QTimer, pyqtSignal, QParallelAnimationGroup, QPoint)
 from PyQt6.QtGui import QPainter, QIcon, QColor
 from PyQt6.QtWidgets import (QWidget, QFrame, QLabel, QHBoxLayout, QVBoxLayout,
-                             QToolButton, QGraphicsOpacityEffect)
+                             QToolButton, QGraphicsOpacityEffect, QApplication)
 
 from ...common.auto_wrap import TextWrap
 from ...common.style_sheet import FluentStyleSheet, themeColor
@@ -69,6 +70,7 @@ class InfoBar(QFrame):
     """ Information bar """
 
     closedSignal = pyqtSignal()
+    _desktopView = None     # type: DesktopInfoBarView
 
     def __init__(self, icon: Union[InfoBarIcon, FluentIconBase, QIcon, str], title: str, content: str,
                  orient=Qt.Orientation.Horizontal, isClosable=True, duration=1000, position=InfoBarPosition.TOP_RIGHT,
@@ -293,6 +295,15 @@ class InfoBar(QFrame):
     def error(cls, title, content, orient=Qt.Orientation.Horizontal, isClosable=True, duration=1000,
               position=InfoBarPosition.TOP_RIGHT, parent=None):
         return cls.new(InfoBarIcon.ERROR, title, content, orient, isClosable, duration, position, parent)
+
+    @classmethod
+    def desktopView(cls):
+        """ Returns the desktop container """
+        if not cls._desktopView:
+            cls._desktopView = DesktopInfoBarView()
+            cls._desktopView.show()
+
+        return cls._desktopView
 
 
 class InfoBarManager(QObject):
@@ -555,3 +566,18 @@ class BottomInfoBarManager(InfoBarManager):
     def _slideStartPos(self, infoBar: InfoBar):
         pos = self._pos(infoBar)
         return QPoint(pos.x(), pos.y() + 16)
+
+
+class DesktopInfoBarView(QWidget):
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        if sys.platform == "win32":
+            self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint | Qt.WindowType.SubWindow)
+        else:
+            self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint | Qt.WindowType.Tool | Qt.WindowType.WindowTransparentForInput)
+
+        self.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.setGeometry(QApplication.primaryScreen().availableGeometry())
