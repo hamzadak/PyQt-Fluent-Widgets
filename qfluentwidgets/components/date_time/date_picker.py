@@ -42,6 +42,11 @@ class DatePickerBase(PickerBase):
     def monthFormatter(self):
         return self._monthFormatter or MonthFormatter()
 
+    def reset(self):
+        """ Reset date """
+        self._date = QDate()
+        super().reset()
+
 
 class MonthFormatter(PickerColumnFormatter):
     """ Month formatter """

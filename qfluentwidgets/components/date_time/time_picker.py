@@ -34,6 +34,11 @@ class TimePickerBase(PickerBase):
         """ set the visibility of seconds column """
         raise NotImplementedError
 
+    def reset(self):
+        """ Reset time """
+        self._time = QTime()
+        super().reset()
+
 
 class MiniuteFormatter(DigitFormatter):
     """ Minute formatter """
