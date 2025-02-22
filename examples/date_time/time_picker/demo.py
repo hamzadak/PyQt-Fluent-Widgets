@@ -35,6 +35,10 @@ class Demo(QWidget):
         self.timePicker2 = TimePicker(self)
         self.timePicker3 = TimePicker(self, showSeconds=True)
 
+        # enable reset button
+        # self.datePicker1.setResetEnabled(True)
+        # self.timePicker1.setResetEnabled(True)
+
         # customize column format
         self.timePicker3.setColumnFormatter(2, SecondsFormatter())
 

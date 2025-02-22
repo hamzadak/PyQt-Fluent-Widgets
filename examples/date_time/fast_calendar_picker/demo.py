@@ -17,6 +17,9 @@ class Demo(QWidget):
         self.picker = FastCalendarPicker(self)
         self.picker.dateChanged.connect(print)
 
+        # enable reset button
+        # self.picker.setResetEnabled(True)
+
         # customize animation
         # self.picker.setFlyoutAnimationType(FlyoutAnimationType.SLIDE_RIGHT)
 

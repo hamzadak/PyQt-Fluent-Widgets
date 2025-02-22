@@ -17,6 +17,9 @@ class Demo(QWidget):
         self.picker = CalendarPicker(self)
         self.picker.dateChanged.connect(print)
 
+        # enable reset button
+        # self.picker.setResetEnabled(True)
+        
         # set date
         # self.picker.setDate(QDate(2023, 5, 30))
 
